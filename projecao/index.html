@@ -65,6 +65,11 @@ p{margin:0;max-width:66ch}
 .cen.real .barra-tot{background:rgba(243,235,223,.2)}
 .barra-tot i{display:block;height:100%}
 .leg{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px}
+.q{font:inherit;font-size:11px;font-weight:800;width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;background:transparent;color:inherit;cursor:pointer;display:inline-grid;place-items:center;padding:0;margin-left:5px;vertical-align:1px;opacity:.8}
+.q:hover,.q[aria-expanded="true"]{opacity:1;background:var(--mostarda);border-color:var(--mostarda);color:var(--chocolate)}
+.explica{background:var(--chocolate);color:var(--creme);border-radius:16px;padding:16px 18px;font-size:14.5px;display:flex;flex-direction:column;gap:6px}
+.explica b{font-size:16px}
+.explica[hidden]{display:none}
 .leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
 .premissas{width:100%;border-collapse:collapse;font-size:14px}
 .premissas th,.premissas td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--linha);vertical-align:top}
@@ -115,6 +120,7 @@ p{margin:0;max-width:66ch}
         <div class="leg"><span><i style="background:var(--salvia)"></i>orgânico</span><span><i style="background:var(--mostarda)"></i>base de alunas</span><span><i style="background:var(--terracota)"></i>leads novos</span><span><i style="background:var(--mostarda-clara)"></i>lembrete do grupo</span></div>
       </div>
       <div class="cens" id="c1"></div>
+      <div class="explica" id="e1" hidden role="status"></div>
     </div>
   </div>
 </section>
@@ -130,6 +136,7 @@ p{margin:0;max-width:66ch}
         <div class="leg"><span><i style="background:var(--mostarda)"></i>base de alunas</span><span><i style="background:var(--terracota)"></i>leads novos</span></div>
       </div>
       <div class="cens" id="c2"></div>
+      <div class="explica" id="e2" hidden role="status"></div>
     </div>
   </div>
 </section>
@@ -144,8 +151,8 @@ p{margin:0;max-width:66ch}
       <tbody>
         <tr><td>Custo por lead (imersão, dezembro)</td><td class="n">R$ 8,13</td><td class="n">R$ 6,00</td><td class="n">R$ 4,00</td><td>R$ 8,13 foi a Black/25 real; R$ 2,82 foi out/25. Dezembro fica entre os dois.</td></tr>
         <tr><td>Custo por lead (curso, janeiro)</td><td class="n">R$ 6,00</td><td class="n">R$ 4,00</td><td class="n">R$ 3,00</td><td>Mais perto de out/25 (R$ 2,82), com folga pro ticket maior.</td></tr>
-        <tr><td>Lead do anúncio que compra a imersão</td><td class="n">4%</td><td class="n">6%</td><td class="n">8%</td><td>O grupo orgânico converte 7% a 14% (48 a 92 vendas em 600 a 700). O lead de anúncio é mais frio: metade disso ou menos.</td></tr>
-        <tr><td>Lead do anúncio que compra o curso</td><td class="n">2,5%</td><td class="n">4%</td><td class="n">5,5%</td><td>Manager Club out/25 vendeu 54 em ~800 no grupo (6,75%) com ticket de R$ 952.</td></tr>
+        <tr><td>Lead novo que compra a imersão</td><td class="n">5%</td><td class="n">7%</td><td class="n">9%</td><td>O grupo orgânico converte 7% a 14% (48 a 92 vendas em 600 a 700). O lead novo vem de público semelhante às alunas e de quem já assistiu os vídeos, e é aquecido pelo mesmo conteúdo do orgânico. Por isso fica perto da conversão orgânica, um pouco abaixo.</td></tr>
+        <tr><td>Lead novo que compra o curso</td><td class="n">3%</td><td class="n">4,5%</td><td class="n">6%</td><td>Manager Club out/25 vendeu 54 em ~800 no grupo (6,75%) com ticket de R$ 952, já com anúncio rodando.</td></tr>
         <tr><td>Alunas da base que compram por causa do remarketing</td><td class="n">2%</td><td class="n">4%</td><td class="n">6%</td><td>Recompra imersão → imersão é 7,1%; Manager Club → imersão, 18,6%. Contamos só uma parte, pra não somar quem já compraria no orgânico.</td></tr>
         <tr><td>Vendas a mais com lembrete pro grupo</td><td class="n">0%</td><td class="n">+5%</td><td class="n">+10%</td><td>Comparecimento na live é de 40 a 80 em cada 100. Lembrete pago aumenta quem aparece.</td></tr>
         <tr><td>Divisão da verba</td><td colspan="3">20% remarketing (até R$ 300 na imersão, até R$ 500 no curso), o resto em captação</td><td>Base de 272 alunas e públicos de vídeo e engajamento de 2.600 a 4.500 pessoas.</td></tr>
@@ -181,8 +188,24 @@ p{margin:0;max-width:66ch}
   var $=function(i){return document.getElementById(i);};
   var brl=function(v){return 'R$ '+Math.round(v).toLocaleString('pt-BR');};
   var n=function(v){return Math.round(v).toLocaleString('pt-BR');};
-  var C1=[{nome:'Conservador',cpl:8.13,conv:.04,base:.02,lemb:0,org:50},{nome:'Realista',cpl:6,conv:.06,base:.04,lemb:.05,org:65},{nome:'Otimista',cpl:4,conv:.08,base:.06,lemb:.10,org:80}];
-  var C2=[{nome:'Conservador',cpl:6,conv:.025,base:.02},{nome:'Realista',cpl:4,conv:.04,base:.04},{nome:'Otimista',cpl:3,conv:.055,base:.06}];
+  var DEF={
+    org:['Orgânico','As vendas que vocês já projetam sem anúncio: 50 a 80 na imersão, como nos últimos lançamentos. Fica de fora da conta do tráfego.'],
+    base:['Base de alunas','As 272 pessoas que já compraram de vocês. O anúncio de remarketing mostra a imersão nova pra elas no Instagram, inclusive pra quem não viu os stories. Contamos só uma parte das que recompram (14,3% já compraram 2 vezes), pra não somar quem compraria de qualquer jeito.'],
+    novos:['Leads novos','Gente que ainda não segue vocês e entra no grupo pelo anúncio. Vem de dois lugares: público semelhante às alunas (o Meta usa as 272 compradoras e as inscritas como modelo e acha pessoas com o mesmo comportamento de compra) e quem já assistiu os vídeos de vocês. Como o conteúdo é o mesmo que converte no orgânico, esse lead converte perto do orgânico.'],
+    lemb:['Lembrete do grupo','Anúncio pequeno só pra quem já está no grupo, lembrando da aula ao vivo e da abertura do carrinho. Hoje de cada 100 no grupo, 40 a 80 aparecem na live. Mais gente na aula, mais vendas.'],
+    roas:['Cada R$ 1 volta','Faturamento a mais dividido pelo que foi investido em anúncio. Ex.: R$ 3,00 quer dizer que cada real investido trouxe três de volta em vendas.']
+  };
+  window.Q=function(k){return '<button type="button" class="q" data-q="'+k+'" aria-label="O que é '+DEF[k][0]+'?" aria-expanded="false">?</button>';};
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('.q'); if(!b) return;
+    var box=b.closest('.lanc').querySelector('.explica'), k=b.dataset.q, aberto=b.getAttribute('aria-expanded')==='true';
+    [].forEach.call(document.querySelectorAll('.q'),function(x){x.setAttribute('aria-expanded','false');});
+    if(aberto){ box.hidden=true; return; }
+    [].forEach.call(b.closest('.lanc').querySelectorAll('.q[data-q="'+k+'"]'),function(x){x.setAttribute('aria-expanded','true');});
+    box.innerHTML='<b>'+DEF[k][0]+'</b><span>'+DEF[k][1]+'</span>'; box.hidden=false;
+  });
+  var C1=[{nome:'Conservador',cpl:8.13,conv:.05,base:.02,lemb:0,org:50},{nome:'Realista',cpl:6,conv:.07,base:.04,lemb:.05,org:65},{nome:'Otimista',cpl:4,conv:.09,base:.06,lemb:.10,org:80}];
+  var C2=[{nome:'Conservador',cpl:6,conv:.03,base:.02},{nome:'Realista',cpl:4,conv:.045,base:.04},{nome:'Otimista',cpl:3,conv:.06,base:.06}];
   function barra(partes,tot){ return '<div class="barra-tot">'+partes.map(function(p){return '<i style="width:'+(tot>0?p[0]/tot*100:0)+'%;background:var('+p[1]+')"></i>';}).join('')+'</div>'; }
   function r1(){
     var b=+$('v1').value; $('o1').textContent=brl(b);
@@ -192,8 +215,8 @@ p{margin:0;max-width:66ch}
       return '<div class="cen'+(i===1?' real':'')+'"><span class="nome">'+c.nome+'</span>'
         +'<div class="extra num">+ '+brl(fat)+'</div><div class="sub">além do orgânico · '+n(v)+' vendas a mais</div>'
         +barra([[c.org,'--salvia'],[vB,'--mostarda'],[vN,'--terracota'],[vL,'--mostarda-clara']],tot)
-        +'<dl><dt>Orgânico (Lara)</dt><dd>'+n(c.org)+' vendas</dd><dt>+ base de alunas</dt><dd>'+n(vB)+'</dd><dt>+ leads novos ('+n(leads)+' a R$ '+c.cpl.toLocaleString('pt-BR',{minimumFractionDigits:2})+')</dt><dd>'+n(vN)+'</dd><dt>+ lembrete do grupo</dt><dd>'+n(vL)+'</dd>'
-        +'<dt class="total">Total do lançamento</dt><dd class="total">'+n(tot)+' · '+brl(tot*197)+'</dd><dt>Cada R$ 1 em anúncio volta</dt><dd>R$ '+(fat/b).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</dd></dl></div>';
+        +'<dl><dt>Orgânico (Lara)'+Q('org')+'</dt><dd>'+n(c.org)+' vendas</dd><dt>+ base de alunas'+Q('base')+'</dt><dd>'+n(vB)+'</dd><dt>+ leads novos'+Q('novos')+'<br><small>'+n(leads)+' a R$ '+c.cpl.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</small></dt><dd>'+n(vN)+'</dd><dt>+ lembrete do grupo'+Q('lemb')+'</dt><dd>'+n(vL)+'</dd>'
+        +'<dt class="total">Total do lançamento</dt><dd class="total">'+n(tot)+' · '+brl(tot*197)+'</dd><dt>Cada R$ 1 em anúncio volta'+Q('roas')+'</dt><dd>R$ '+(fat/b).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</dd></dl></div>';
     }).join('');
   }
   function r2(){
@@ -203,8 +226,8 @@ p{margin:0;max-width:66ch}
       return '<div class="cen'+(i===1?' real':'')+'"><span class="nome">'+c.nome+'</span>'
         +'<div class="extra num">+ '+brl(fat)+'</div><div class="sub">além do orgânico · '+n(v)+' vendas a mais</div>'
         +barra([[vB,'--mostarda'],[vN,'--terracota']],v)
-        +'<dl><dt>+ base de alunas</dt><dd>'+n(vB)+'</dd><dt>+ leads novos ('+n(leads)+' a R$ '+c.cpl.toLocaleString('pt-BR',{minimumFractionDigits:2})+')</dt><dd>'+n(vN)+'</dd>'
-        +'<dt class="total">Faturamento a mais</dt><dd class="total">'+brl(fat)+'</dd><dt>Cada R$ 1 em anúncio volta</dt><dd>R$ '+(fat/b).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</dd></dl></div>';
+        +'<dl><dt>+ base de alunas'+Q('base')+'</dt><dd>'+n(vB)+'</dd><dt>+ leads novos'+Q('novos')+'<br><small>'+n(leads)+' a R$ '+c.cpl.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</small></dt><dd>'+n(vN)+'</dd>'
+        +'<dt class="total">Faturamento a mais</dt><dd class="total">'+brl(fat)+'</dd><dt>Cada R$ 1 em anúncio volta'+Q('roas')+'</dt><dd>R$ '+(fat/b).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</dd></dl></div>';
     }).join('');
   }
   $('v1').addEventListener('input',r1); $('v2').addEventListener('input',r2); r1(); r2();
